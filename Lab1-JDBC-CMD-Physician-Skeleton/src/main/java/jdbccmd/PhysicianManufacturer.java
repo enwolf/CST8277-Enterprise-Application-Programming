@@ -1,7 +1,7 @@
 /*********************************************************************************************************
  * File:  PhysicianManufacturer.java Course Materials CST 8277
  * 
- * @author Teddy Yap
+ * @author Robin Phillis
  */
 package jdbccmd;
 
@@ -26,9 +26,10 @@ import uk.co.jemos.podam.typeManufacturers.StringTypeManufacturerImpl;
  * This class used the PODAM (POJO Data Mocker) library.  The idea is to provide the needed data and this class randomize
  * data for the given object.
  * 
- * @author Teddy Yap
+ * @author Robin Phillis
  */
 public class PhysicianManufacturer extends StringTypeManufacturerImpl {
+	
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	//Name of the fields in the Physician class
@@ -36,12 +37,13 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 	private static final String FIRSTNAME_FIELD = "firstName";
 	private static final String EMAIL_FIELD = "email";
 	private static final String PHONENUMBER_FIELD = "phoneNumber";
-	//TODO Add a String constant SPECIALTY_FIELD
+	private static final String SPECIALTY_FIELD = "specialty";
+
 	
 	//Name of the files with data in them
 	protected static final String POOL_OF_LASTNAMES = "lastnamePool.txt";
 	protected static final String POOL_OF_FIRSTNAMES = "firstnamePool.txt";
-	//TODO Add a String constant POOL_OF_SPECIALTIES
+	protected static final String POOL_OF_SPECIALTIES = "specialtyPool.txt";
 	
 	//List of useful digits and letters
 	protected static final String ALPHA_LETTERS = "abcdefghijklmnopqrstuvwxyz";
@@ -54,34 +56,44 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 	//List of loaded data pool
 	protected static List<String> poolOfLastnames = new ArrayList<>();
 	protected static List<String> poolOfFirstnames = new ArrayList<>();
-	//TODO Declare an array list called poolOfSpecialties
+	protected static List<String> poolOfSpecialties = new ArrayList<>();
 
 	//Load the pool of data into the list
-	static {
+	static 
+	{
 		
 		ClassLoader theClassLoader = MethodHandles.lookup().lookupClass().getClassLoader();
 		
-		try (InputStream firstnamePoolInputStream = theClassLoader.getResourceAsStream(POOL_OF_FIRSTNAMES);
+		try (
+			
+			InputStream firstnamePoolInputStream = theClassLoader.getResourceAsStream(POOL_OF_FIRSTNAMES);
 			InputStream lastnamePoolInputStream = theClassLoader.getResourceAsStream(POOL_OF_LASTNAMES);
-			//TODO Declare and initialize an input stream object called specialtyPoolInputStream
+			InputStream specialtyPoolInputStream = theClassLoader.getResourceAsStream(POOL_OF_SPECIALTIES);
 			
 			Scanner lastnamePoolScanner = new Scanner(lastnamePoolInputStream);
 			Scanner firstnamePoolScanner = new Scanner(firstnamePoolInputStream);
-			//TODO Declare and initialize a scanner object called specialtyPoolScanner
-
-		) {
-			while (lastnamePoolScanner.hasNext()) {
+			Scanner specialtyPoolScanner = new Scanner(specialtyPoolInputStream);
+			
+		    ) 
+		{
+			while (lastnamePoolScanner.hasNext()) 
+			{
 				poolOfLastnames.add(lastnamePoolScanner.nextLine());
 			}
 
-			while (firstnamePoolScanner.hasNext()) {
+			while (firstnamePoolScanner.hasNext()) 
+			{
 				poolOfFirstnames.add(firstnamePoolScanner.nextLine());
 			}
-
-			//TODO Load the contents of specialtyPoolScanner into poolOfSpecialties
 			
-			
-		} catch (IOException e) {
+			while (specialtyPoolScanner.hasNext()) 
+			{
+				poolOfSpecialties.add(specialtyPoolScanner.nextLine());
+			}
+	
+		} 
+		catch (IOException e) 
+		{
 			logger.error("something went wrong building pools:  {}", e.getLocalizedMessage());
 		}
 
@@ -90,21 +102,24 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 	//Depending on the attribute name, create random data for that field and return it.
 	@Override
 	public String getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata,
-			Map< String, Type> genericTypesArgumentsMap) {
+			Map< String, Type> genericTypesArgumentsMap) 
+	{
 		
 		String stringType = "";
 		
-		if (EMAIL_FIELD.equals(attributeMetadata.getAttributeName())) {
-			
+		if (EMAIL_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			//Create random email
 			StringBuilder sb = new StringBuilder();
 			
-			while (sb.length() < 3) {
+			while (sb.length() < 3) 
+			{
 				int index = (int) (rnd.nextFloat() * ALPHA_LETTERS.length());
 				sb.append(ALPHA_LETTERS.charAt(index));
 			}
 			
-			while (sb.length() < 8) {
+			while (sb.length() < 8) 
+			{
 				int index = (int) (rnd.nextFloat() * DIGITS.length());
 				sb.append(DIGITS.charAt(index));
 			}
@@ -112,28 +127,33 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 			sb.append("@algonquinlive.com");
 			stringType = sb.toString();
 			
-		} else if (LASTNAME_FIELD.equals(attributeMetadata.getAttributeName())) {
-			
+		} 
+		
+		else if (LASTNAME_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			stringType = poolOfLastnames.get(rnd.nextInt(poolOfLastnames.size()));
-			
-		} else if (FIRSTNAME_FIELD.equals(attributeMetadata.getAttributeName())) {
-			
-			stringType = poolOfFirstnames.get(rnd.nextInt(poolOfFirstnames.size()));
-			
-		} else if (PHONENUMBER_FIELD.equals(attributeMetadata.getAttributeName())) {
-			
+		} 
+		
+		else if (FIRSTNAME_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
+			stringType = poolOfFirstnames.get(rnd.nextInt(poolOfFirstnames.size()));			
+		} 
+		
+		else if (PHONENUMBER_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			int npa = rnd.nextInt(643) + 100;
 			int extension = rnd.nextInt(9000) + 1000;
 			stringType = String.format("613%03d%04d", npa, extension);
-
 		} 
-
-		//TODO Add an else-if for the SPECIALTY_FIELD
 		
-		else {
-			
-			stringType = super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
-			
+		else if (SPECIALTY_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
+			stringType = poolOfSpecialties.get(rnd.nextInt(poolOfSpecialties.size()));			
+		} 
+	
+		else 
+		{			
+			stringType = super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);			
 		}
 		
 		return stringType;

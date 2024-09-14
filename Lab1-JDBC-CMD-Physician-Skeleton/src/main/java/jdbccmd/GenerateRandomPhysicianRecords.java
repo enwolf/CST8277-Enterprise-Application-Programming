@@ -1,10 +1,34 @@
 /*********************************************************************************************************
  * File:  GenerateRandomPhysicianRecords.java Course Materials CST8277
  * 
- * @author Mike Norman
- * @author Teddy Yap
- * @author Shariar (Shawn) Emami
+ * @author Robin Phillis
+ * @version 1.0
+ * @since 2024-09-14
+ * 
+ * @description This class generates random physician records and inserts them into a database. 
+ *              It uses the Picocli library for command-line argument parsing, the Podam library for 
+ *              generating random data, and SLF4J for logging. The class includes methods to 
+ *              truncate the existing data in the physician table, insert new records, and log 
+ *              information about the generated records.
+ * 
+ * @see picocli.CommandLine
+ * @see uk.co.jemos.podam.api.PodamFactory
+ * @see uk.co.jemos.podam.api.PodamFactoryImpl
+ * @see uk.co.jemos.podam.api.ClassInfoStrategy
+ * @see uk.co.jemos.podam.api.DefaultClassInfoStrategy
+ * @see org.slf4j.Logger
+ * @see org.slf4j.LoggerFactory
+ * @see java.sql.Connection
+ * @see java.sql.DriverManager
+ * @see java.sql.PreparedStatement
+ * @see java.sql.ResultSet
+ * @see java.sql.SQLException
+ * @see java.sql.Statement
+ * @see java.time.Duration
+ * @see java.time.Instant
+ * @see java.util.Properties
  */
+
 package jdbccmd;
 
 import java.io.PrintWriter;
@@ -32,170 +56,186 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 /**
- * Helper class that generates random physicians and writes them to the database
+ * A command-line application that generates random physician records and inserts them into a database.
+ * <p>
+ * This class uses Picocli for command-line parsing and the Podam library for generating random data.
+ * It logs the generated data and timing information using SLF4J.
+ * </p>
  */
 @Command(description = "Generate random physicians", name = "jdbccmd.GenerateRandomPhysicianRecords")
 public class GenerateRandomPhysicianRecords {
 	
-	//Get the current class type, in this case "jdbccmd.GenerateRandomPhysicianRecords"
+	/** The current class type */
 	protected static final Class<?> MY_KLASSNAME = MethodHandles.lookup().lookupClass();
 	
-	//Create a logger based on the type of the current class
+	/** Logger for the class */
 	private static final Logger logger = LoggerFactory.getLogger(MY_KLASSNAME);
 
-	//Error message to be customized for CMD display
+	/** Error message for command-line parsing failures */
 	protected static final String CMDLINE_PARSING_ERROR_MSG = "cmdLine parsing error:  {}";
 	
-	//Message to be customized for time taken to complete the current task.
+	/** Message for elapsed time logging */
 	protected static final String ELAPSED_TIME_MSG = "Elapsed time = {} ms";
 	
-	//Empty the table before adding new content to it.
+	/** SQL statement to truncate the physician table */
 	private static final String TRUNC_PHYSICIAN = "TRUNCATE TABLE PHYSICIAN";
 	
-	//Insert statement for physician table
-	//TODO add the specialty field into the INSERT statement below
-	protected static final String INSERT_PHYSICIAN = "INSERT INTO PHYSICIAN(LAST_NAME, FIRST_NAME, EMAIL, PHONE, CREATED) VALUES (?, ?, ?, ?, now())";
+	/** SQL statement to insert a physician record */
+	protected static final String INSERT_PHYSICIAN = "INSERT INTO PHYSICIAN(LAST_NAME, FIRST_NAME, EMAIL, PHONE, SPECIALTY, CREATED) VALUES (?, ?, ?, ?, ?, now())";
 
-	public static void main(String[] args) {
-		
-		//Create an instance of CmdLineOptions class which has the variables we need from CMD.
+	/**
+	 * Main method to run the application.
+	 * <p>
+	 * Parses command-line arguments, generates physician records, and writes them to the database.
+	 * </p>
+	 * 
+	 * @param args Command-line arguments
+	 */
+	public static void main(String[] args) 
+	{
 		CmdLineOptions cmdLineOptions = new CmdLineOptions();
-		
-		//Pass the instance of CmdLineOptions class to picocli.CommandLine to automatically pass CMD arguments.
 		CommandLine cmdLine = new CommandLine(cmdLineOptions);
-		
-		//Pass the name of the class which is operating CommandLine instance.
 		cmdLine.setCommandName(MY_KLASSNAME.getName());
 		
-		try {
-			
-			//Parse incoming arguments 
-			cmdLine.parseArgs(args);
-			
-		} catch (ParameterException e) {
-			
-			//Let user know the parsing has failed.
+		try 
+		{			
+			cmdLine.parseArgs(args);			
+		}
+		catch (ParameterException e) 
+		{
 			logger.error(CMDLINE_PARSING_ERROR_MSG, e.getLocalizedMessage());
 			logCmdLineUsage(e.getCommandLine(), LogLevel.ERROR);
-			System.exit(-1);
-			
+			System.exit(-1);			
 		}
 		
-		if (cmdLineOptions.helpRequested) {
-			
-			//Display help
-			logCmdLineUsage(cmdLine, LogLevel.INFO);
-			
-		} else {
-			
-			//Generate data for DB
+		if (cmdLineOptions.helpRequested) 
+		{
+			logCmdLineUsage(cmdLine, LogLevel.INFO);			
+		} 
+		else 
+		{
 			generatePhysicians(cmdLineOptions.jdbcUrl, cmdLineOptions.username, cmdLineOptions.password,
 					cmdLineOptions.count);
-			
 		}
-		
 	}
 
-	public static void generatePhysicians(String jdbcUrl, String username, String password, int genCount) {
+	/**
+	 * Generates random physician records and inserts them into the database.
+	 * 
+	 * @param jdbcUrl The JDBC URL of the database
+	 * @param username The username for the database connection
+	 * @param password The password for the database connection
+	 * @param genCount The number of physician records to generate
+	 */
+	public static void generatePhysicians(String jdbcUrl, String username, String password, int genCount) 
+	{
 		Instant startTime = Instant.now();
 
-		//Create a properties object to store the password and username
 		Properties dbProps = new Properties();
 		dbProps.put("user", username);
 		dbProps.put("password", password);
 
-		//TODO Complete the try with resource below.
-        try ( //try-with-resources:  auto-close'ing resources makes catch-finally logic easier
-       
-        	//Create a new connection using jdbcUrl and the db properties object above.
+		try ( 
         	Connection connection = DriverManager.getConnection(jdbcUrl, dbProps);
-    		
-           	//TODO Create a PreparedStatement for INSERT_PHYSICIAN.  We also want the ability to get the
-            //generated id back - use Statement.RETURN_GENERATED_KEYS as second parameter
-            PreparedStatement pstmtInsert = null;
-
-       		//TODO Create a PreparedStatement for TRUNC_PHYSICIAN.
-            PreparedStatement pstmtTrunc = null;
-        		
-        ) {
+        	PreparedStatement pstmtTrunc = connection.prepareStatement(TRUNC_PHYSICIAN);        	
+        	PreparedStatement pstmtInsert = connection.prepareStatement(INSERT_PHYSICIAN, Statement.RETURN_GENERATED_KEYS);
+        )
+        {	
+        	pstmtTrunc.executeUpdate();
         	
-            //TODO Don't forget to execute the truncate statement here before performing any insert
-
-			//PODAM - POjo DAta Mocker
 			PodamFactory factory = new PodamFactoryImpl();
 			ClassInfoStrategy classInfoStrategy = factory.getClassStrategy();
-			
-			//No need to generate primary key (id), database will do that for us
 			((DefaultClassInfoStrategy) classInfoStrategy).addExcludedField(Physician.class, "id");
 			factory.getStrategy().addOrReplaceTypeManufacturer(String.class, new PhysicianManufacturer());
 			
-			for (int cnt = 0, numRandomPhysicians = genCount; cnt < numRandomPhysicians; cnt++) {
-				
+			logger.info("==========================================================================  PHYSICIAN DATA ==========================================================================");
+			logger.info("| ID  | Last Name  | First Name | Email                       | Phone Number  | Specialty                                     | Created                             |");
+			logger.info("=====================================================================================================================================================================");
+			
+			for (int cnt = 0, numRandomPhysicians = genCount; cnt < numRandomPhysicians; cnt++) 
+			{
 				Physician randomPhysician = factory.manufacturePojoWithFullData(Physician.class);
+				String formattedPhoneNumber = formatPhoneNumber(randomPhysician.getPhoneNumber());
 				
-				//Write randomPhysician to database
-				//Setters are chosen based on the data type, setString, setInt, setDouble, etc.
-				//The number as first argument represents the order of the '?' in the INSERT_PHYSICIAN statement.
 				pstmtInsert.setString(1, randomPhysician.getLastName());
 				pstmtInsert.setString(2, randomPhysician.getFirstName());
 				pstmtInsert.setString(3, randomPhysician.getEmail());
-				pstmtInsert.setString(4, randomPhysician.getPhoneNumber());
-				//TODO Set the specialty field of the INSERT_PHYSICIAN statement.
+				pstmtInsert.setString(4, formattedPhoneNumber);
+				pstmtInsert.setString(5, randomPhysician.getSpecialty());
 				
-				//Execute the query, return true if successful
 				pstmtInsert.execute();
 				
-				//Get the generated keys from DB as the result of INSERT_PHYSICIAN statement.
-				//The ResultSet is AutoCloseable so it can be placed in a try-with-resource to be auto closed.
-				try (ResultSet generatedKeys = pstmtInsert.getGeneratedKeys()) {
-					
-					if (generatedKeys.next()) { //If a key is returned
-						
-						int id = generatedKeys.getInt(1); //Get the key
-						
-						//Set the key to the physician and print it on the console
+				try (ResultSet generatedKeys = pstmtInsert.getGeneratedKeys()) 
+				{
+					if (generatedKeys.next()) 
+					{
+						int id = generatedKeys.getInt(1); 
 						randomPhysician.setId(id);
-						
 						logger.debug("created random physician \r\n\t{}", randomPhysician);
-						
-					} else {
-						
-						logger.error("could not retrieve generated PK");
-						
-					}
 					
-				}
-				
+						String logMessage = String.format(
+						    "| %-3s | %-10s | %-10s | %-27s | %-13s | %-45s | %-35s |", 
+						    id,
+						    randomPhysician.getLastName(),
+						    randomPhysician.getFirstName(),
+						    randomPhysician.getEmail(),
+						    formattedPhoneNumber,
+						    randomPhysician.getSpecialty(),
+						    randomPhysician.getCreated().toString()
+						);
+
+						logger.info(logMessage);
+					}
+					else 
+					{
+						logger.error("could not retrieve generated PK");
+					}
+				}				
 			}
-			
-		//Catch any exceptions that might have been thrown from Connection, PreparedStatement, and/or ResultSet
-		} catch (SQLException e) {
-			
+			logger.info("|                                                                                                                                                                   |"); 
+		} 
+        catch (SQLException e) 
+        {
 			logger.error("something went wrong inserting new physician, ", e);
-			
 		}
 
 		Instant endTime = Instant.now();
 		long elapsedTime = Duration.between(startTime, endTime).toMillis();
-		logger.info(ELAPSED_TIME_MSG, elapsedTime);
-		
+		logger.info("| " + ELAPSED_TIME_MSG + "                                                                                                                                             |", elapsedTime);
+		logger.info("|                                                                                                                                                                   |"); 
+		logger.info("=====================================================================================================================================================================");
 	}
 
 	/**
-	 * Print the content of the LoggingOutputStream to the logger
+	 * Prints the content of the command-line usage to the logger.
 	 * 
-	 * @param cmdLine - command line instance
-	 * @param los     - custom SLF4J instance
+	 * @param cmdLine The CommandLine instance used for parsing
+	 * @param level The log level for outputting the usage information
 	 */
-	protected static void logCmdLineUsage(CommandLine cmdLine, LogLevel level) {
-		
-		//Create a new custom output stream for SLF4J to print to logger.
+	protected static void logCmdLineUsage(CommandLine cmdLine, LogLevel level) 
+	{		
 		LoggingOutputStream los = new LoggingOutputStream(logger, level);
 		PrintWriter pw = new PrintWriter(los);
 		cmdLine.usage(pw);
 		pw.flush();
 		los.line();
-		
 	}
 
+	/**
+	 * Formats a phone number to the standard XXX-XXX-XXXX format.
+	 * 
+	 * @param phoneNumber The phone number to format
+	 * @return The formatted phone number or the original if it does not match the expected length
+	 */
+	public static String formatPhoneNumber(String phoneNumber) 
+	{
+    if (phoneNumber != null && phoneNumber.length() == 10) 
+	    {
+	        return phoneNumber.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "$1-$2-$3");
+	    }
+	    else 
+	    {
+	        return phoneNumber; // return the original phone number if it doesn't match the expected length
+	    }
+	}
 }

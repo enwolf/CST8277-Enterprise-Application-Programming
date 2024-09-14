@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `databank`.`physician`(
   `last_name` VARCHAR(50) NOT NULL,
   `first_name` VARCHAR(50) NOT NULL,
   `email` VARCHAR(100) NULL,
-  `phone` VARCHAR(10) NULL,
+  `phone` VARCHAR(13) NULL,
   `specialty` VARCHAR(45) NULL,
   `created` DATETIME NULL,
   PRIMARY KEY (`id`))

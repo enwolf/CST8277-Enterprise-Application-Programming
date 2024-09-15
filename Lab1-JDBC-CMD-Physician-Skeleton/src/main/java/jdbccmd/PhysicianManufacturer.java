@@ -42,11 +42,9 @@ import uk.co.jemos.podam.typeManufacturers.StringTypeManufacturerImpl;
  * Custom implementation of `StringTypeManufacturerImpl` to generate random data for fields in the 
  * `Physician` class. This implementation is specifically used to provide random values for attributes
  * such as last names, first names, email addresses, phone numbers, and specialties.
- * <p>
  * The class uses predefined pools of data loaded from text files and a `SecureRandom` instance for 
  * generating random values. The email addresses and phone numbers are generated according to specific 
  * formats, while other attributes are selected from the loaded data pools.
- * </p>
  * 
  * @see uk.co.jemos.podam.typeManufacturers.StringTypeManufacturerImpl
  * @see uk.co.jemos.podam.api.AttributeMetadata
@@ -103,20 +101,26 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 			Scanner lastnamePoolScanner = new Scanner(lastnamePoolInputStream);
 			Scanner firstnamePoolScanner = new Scanner(firstnamePoolInputStream);
 			Scanner specialtyPoolScanner = new Scanner(specialtyPoolInputStream);
-		) {
-			while (lastnamePoolScanner.hasNext()) {
+			) 
+		{
+			while (lastnamePoolScanner.hasNext()) 
+			{
 				poolOfLastnames.add(lastnamePoolScanner.nextLine());
 			}
 
-			while (firstnamePoolScanner.hasNext()) {
+			while (firstnamePoolScanner.hasNext()) 
+			{
 				poolOfFirstnames.add(firstnamePoolScanner.nextLine());
 			}
 			
-			while (specialtyPoolScanner.hasNext()) {
+			while (specialtyPoolScanner.hasNext()) 
+			{
 				poolOfSpecialties.add(specialtyPoolScanner.nextLine());
 			}
 	
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("Error loading data pools: {}", e.getLocalizedMessage());
 		}
 	}
@@ -136,20 +140,24 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 	 */
 	@Override
 	public String getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata,
-			Map<String, Type> genericTypesArgumentsMap) {
+			Map<String, Type> genericTypesArgumentsMap) 
+	{
 		
 		String stringType = "";
 		
-		if (EMAIL_FIELD.equals(attributeMetadata.getAttributeName())) {
+		if (EMAIL_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			// Generate a random email address
 			StringBuilder sb = new StringBuilder();
 			
-			while (sb.length() < 3) {
+			while (sb.length() < 3) 
+			{
 				int index = (int) (rnd.nextFloat() * ALPHA_LETTERS.length());
 				sb.append(ALPHA_LETTERS.charAt(index));
 			}
 			
-			while (sb.length() < 8) {
+			while (sb.length() < 8) 
+			{
 				int index = (int) (rnd.nextFloat() * DIGITS.length());
 				sb.append(DIGITS.charAt(index));
 			}
@@ -157,20 +165,29 @@ public class PhysicianManufacturer extends StringTypeManufacturerImpl {
 			sb.append("@algonquinlive.com");
 			stringType = sb.toString();
 			
-		} else if (LASTNAME_FIELD.equals(attributeMetadata.getAttributeName())) {
+		} 
+		else if (LASTNAME_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			stringType = poolOfLastnames.get(rnd.nextInt(poolOfLastnames.size()));
-		} else if (FIRSTNAME_FIELD.equals(attributeMetadata.getAttributeName())) {
+		}
+		else if (FIRSTNAME_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			stringType = poolOfFirstnames.get(rnd.nextInt(poolOfFirstnames.size()));			
-		} else if (PHONENUMBER_FIELD.equals(attributeMetadata.getAttributeName())) {
+		} 
+		else if (PHONENUMBER_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
 			int npa = rnd.nextInt(643) + 100;
 			int extension = rnd.nextInt(9000) + 1000;
 			stringType = String.format("613%03d%04d", npa, extension);
-		} else if (SPECIALTY_FIELD.equals(attributeMetadata.getAttributeName())) {
-			stringType = poolOfSpecialties.get(rnd.nextInt(poolOfSpecialties.size()));			
-		} else {			
-			stringType = super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);			
 		}
-		
+		else if (SPECIALTY_FIELD.equals(attributeMetadata.getAttributeName())) 
+		{
+			stringType = poolOfSpecialties.get(rnd.nextInt(poolOfSpecialties.size()));			
+		}
+		else 
+		{			
+			stringType = super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);			
+		}		
 		return stringType;
 	}
 

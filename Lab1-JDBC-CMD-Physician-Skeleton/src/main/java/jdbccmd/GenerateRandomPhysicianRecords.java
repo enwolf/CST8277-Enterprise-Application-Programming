@@ -222,13 +222,20 @@ public class GenerateRandomPhysicianRecords {
 	}
 
 	/**
-	 * Formats a phone number to the standard XXX-XXX-XXXX format.
+	 * Formats a 10-digit phone number to the XXX-XXX-XXXX format.
 	 * 
-	 * @param phoneNumber The phone number to format
-	 * @return The formatted phone number or the original if it does not match the expected length
+	 * If the phone number has exactly 10 digits, it is formatted into three groups 
+	 * separated by hyphens. Otherwise, the original number is returned.	 * 
+	 * 
+	 * @param phoneNumber The phone number to format.
+	 * @return The formatted phone number (XXX-XXX-XXXX), or the original input if it's not 10 digits.
 	 */
 	public static String formatPhoneNumber(String phoneNumber) 
 	{
+		// The pattern (\\d{3})(\\d{3})(\\d+) captures 3 groups: the first three digits, 
+	    // the next three digits, and the remaining digits. "$1-$2-$3" refers to these groups, 
+	    // inserting hyphens between them.
+		
     if (phoneNumber != null && phoneNumber.length() == 10) 
 	    {
 	        return phoneNumber.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "$1-$2-$3");

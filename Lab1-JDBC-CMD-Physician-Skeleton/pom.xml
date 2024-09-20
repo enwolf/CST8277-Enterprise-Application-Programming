@@ -11,7 +11,7 @@
 
   <properties>
 	<!-- A property called studentInfo MUST be filled in -->
-    <studentInfo>firstname-lastname-studentno-302</studentInfo>
+    <studentInfo>robin-phillis-040616612-302</studentInfo>
     <exec.mainClass>jdbccmd.GenerateRandomPhysicianRecords</exec.mainClass>
 	
 	<!-- Maven properties -->

@@ -201,7 +201,7 @@ public class GenerateRandomPhysicianRecords {
 
 		Instant endTime = Instant.now();
 		long elapsedTime = Duration.between(startTime, endTime).toMillis();
-		logger.info("| " + ELAPSED_TIME_MSG + "                                                                                                                                             |", elapsedTime);
+		logger.info("| " + ELAPSED_TIME_MSG + "                                                                                                                                            |", elapsedTime);
 		logger.info("|                                                                                                                                                                   |"); 
 		logger.info("=====================================================================================================================================================================");
 	}

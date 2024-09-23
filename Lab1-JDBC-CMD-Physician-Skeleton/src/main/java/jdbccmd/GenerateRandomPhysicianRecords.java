@@ -222,13 +222,27 @@ public class GenerateRandomPhysicianRecords {
 	}
 
 	/**
-	 * Formats a 10-digit phone number to the XXX-XXX-XXXX format.
-	 * 
-	 * If the phone number has exactly 10 digits, it is formatted into three groups 
-	 * separated by hyphens. Otherwise, the original number is returned.	 * 
-	 * 
-	 * @param phoneNumber The phone number to format.
-	 * @return The formatted phone number (XXX-XXX-XXXX), or the original input if it's not 10 digits.
+	 * Generates a specified number of random physician records and inserts them into the database.
+	 * The method connects to the database using the provided JDBC URL, username, and password, truncates
+	 * the existing physician records, and inserts new physician records using the Podam library to generate
+	 * random data.
+	 *
+	 * @param jdbcUrl   the JDBC URL of the database
+	 * @param username  the username to connect to the database
+	 * @param password  the password to connect to the database
+	 * @param genCount  the number of random physician records to generate and insert into the database
+	 *
+	 * This method performs the following steps:
+	 * 1. Establishes a database connection using the provided JDBC URL, username, and password.
+	 * 2. Truncates the existing physician records using a prepared statement.
+	 * 3. Generates random physician data using the Podam library.
+	 * 4. Inserts the generated physician data into the database.
+	 * 5. Logs the details of each inserted physician record, including ID, name, email, phone number, specialty, and creation date.
+	 * 6. Logs the total elapsed time for the operation.
+	 *
+	 * The method uses a `PreparedStatement` for inserting records into the database and retrieves the
+	 * generated primary key for each inserted record. Any SQL exceptions encountered during database
+	 * operations are caught and logged.
 	 */
 	public static String formatPhoneNumber(String phoneNumber) 
 	{

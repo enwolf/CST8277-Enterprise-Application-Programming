@@ -28,7 +28,7 @@ public class PhysicianPojo implements Serializable {
 	protected String firstName;
 	protected String email;
 	protected String phoneNumber;
-	//TODO Add a field to store the specialty of the physician
+	protected String specialty;
 	protected LocalDateTime created;
 
 	public PhysicianPojo() {

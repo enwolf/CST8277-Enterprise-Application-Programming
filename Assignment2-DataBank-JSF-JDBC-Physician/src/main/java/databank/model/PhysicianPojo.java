@@ -35,15 +35,9 @@ public class PhysicianPojo implements Serializable {
 		super();
 	}
 
+	// Getters
 	public int getId() {
 		return id;
-	}
-
-	/**
-	 * @param id new value for id
-	 */
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	/**
@@ -54,17 +48,41 @@ public class PhysicianPojo implements Serializable {
 	}
 
 	/**
-	 * @param firstName new value for firstName
-	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	/**
 	 * @return the value for lastName
 	 */
 	public String getLastName() {
 		return lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public String getSpecialty() {
+		return specialty;
+	}
+
+	public LocalDateTime getCreated() {
+		return created;
+	}
+
+	// Setters
+	/**
+	 * @param id new value for id
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param firstName new value for firstName
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	/**
@@ -74,32 +92,22 @@ public class PhysicianPojo implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getPhoneNumber() {
-		return phoneNumber;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
 
-	//TODO Add getter and setter methods for the specialty field here
-	
+	public void setSpecialty(String specialty) {
+		this.specialty = specialty;
+	}
+
 	public void setCreated(LocalDateTime created) {
 		this.created = created;
 	}
 
-	public LocalDateTime getCreated() {
-		return created;
-	}
-	
 	// Use getter's for member variables
 	@Override
 	public int hashCode() {
@@ -143,7 +151,7 @@ public class PhysicianPojo implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Physician [id = ").append(getId()).append(", ");
 		if (getFirstName() != null) {
-			builder.append( "firstName = ").append(getFirstName()).append(", ");
+			builder.append("firstName = ").append(getFirstName()).append(", ");
 		}
 		if (getLastName() != null) {
 			builder.append("lastName = ").append(getLastName()).append(", ");
@@ -154,9 +162,11 @@ public class PhysicianPojo implements Serializable {
 		if (getPhoneNumber() != null) {
 			builder.append("phoneNumber = ").append(getPhoneNumber()).append(", ");
 		}
+		if (getSpecialty() != null) {
+			builder.append("specialty = ").append(getSpecialty()).append(", ");
+		}
 		//TODO Add code to append the specialty field
 		builder.append("]");
 		return builder.toString();
 	}
-
 }

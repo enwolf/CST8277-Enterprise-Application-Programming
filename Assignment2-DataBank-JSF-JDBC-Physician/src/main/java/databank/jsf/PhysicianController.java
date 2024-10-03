@@ -11,8 +11,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.annotation.SessionMap;
 import jakarta.inject.Inject;
-
+import jakarta.inject.Named;
 import databank.dao.ListDataDao;
 import databank.dao.PhysicianDao;
 import databank.model.PhysicianPojo;
@@ -22,12 +24,15 @@ import databank.model.PhysicianPojo;
  * Delegates all C-R-U-D behavior to DAO
  */
 
-//TODO Don't forget this is a managed bean with a session scope
+@Named
+@SessionScoped
 public class PhysicianController implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	//TODO Use the proper annotations here so that this session map object will be 
 	//     injected.  Please refer to Week 3 sample project to know how this is to be done. 
+    @Inject
+    @SessionMap
 	private Map<String, Object> sessionMap;
 
 	@Inject

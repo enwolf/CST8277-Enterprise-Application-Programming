@@ -55,25 +55,26 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 												 + "VALUES (?, ?, ?, ?, ?, ?)";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to update the fields of a physician in the database.
-	private static final String UPDATE_PHYSICIAN_ALL_FIELDS = "UPDATE physician (first_name, last_name, email, phone_number, specialty) "
-															+ "VALUES (?, ?, ?, ?, ?)";
+	private static final String UPDATE_PHYSICIAN_ALL_FIELDS = "UPDATE physician "
+														    + "SET first_name = ?, last_name = ?, email = ?, phone_number = ?, specialty = ? "
+														    + "WHERE id = ?";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to delete a physician from the database.
-	private static final String DELETE_PHYSICIAN_BY_ID = "DELETE FROM physicians "
+	private static final String DELETE_PHYSICIAN_BY_ID = "DELETE FROM physician "
 													   + "WHERE id = ?";
 
 	@Inject
 	protected ExternalContext externalContext;
 
-	private void logMsg(String msg) {
+	private void logMsg(String msg) 
+	{
 		((ServletContext) externalContext.getContext()).log(msg);
 	}
 
 	//TODO Use the proper annotation here so that the correct data source object
 	//     will be injected
-	@Resource(name = "jdbc/H2Pool")
+	@Resource(name = "java:app/jdbc/databank")
 	protected DataSource databankDS;
-
 	protected Connection connectionToDataBase;
 	protected PreparedStatement readAllPreparedStatement;
 	protected PreparedStatement readByIdPreparedStatement;
@@ -82,8 +83,10 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	protected PreparedStatement deleteByIdPreparedStatement;
 
 	@PostConstruct
-	protected void buildConnectionAndStatements() {
-		try {
+	protected void buildConnectionAndStatements() 
+	{
+		try 
+		{
 			logMsg("building connection and stmts");
 			connectionToDataBase = databankDS.getConnection();
 			readAllPreparedStatement = connectionToDataBase.prepareStatement(READ_ALL);
@@ -91,24 +94,32 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 			updatePreparedStatement = connectionToDataBase.prepareStatement(UPDATE_PHYSICIAN_ALL_FIELDS);
 			deleteByIdPreparedStatement = connectionToDataBase.prepareStatement(DELETE_PHYSICIAN_BY_ID);
 			//TODO Initialize other PreparedStatements here
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			logMsg("something went wrong getting connection from database:  " + e.getLocalizedMessage());
 		}
 	}
 
 	@PreDestroy
-	protected void closeConnectionAndStatements() {
-		try {
-			logMsg("closing stmts and connection");
-			readAllPreparedStatement.close();
-			createPreparedStatement.close();
-			//TODO Close other PreparedStatements here
-			connectionToDataBase.close();
-		} catch (Exception e) {
-			logMsg("something went wrong closing stmts or connection:  " + e.getLocalizedMessage());
-		}
+	protected void closeConnectionAndStatements() 
+	{
+	    try 
+	    {
+	        logMsg("closing stmts and connection");
+	        if (readAllPreparedStatement != null) readAllPreparedStatement.close();
+	        if (createPreparedStatement != null) createPreparedStatement.close();
+	        if (readByIdPreparedStatement != null) readByIdPreparedStatement.close();
+	        if (updatePreparedStatement != null) updatePreparedStatement.close();
+	        if (deleteByIdPreparedStatement != null) deleteByIdPreparedStatement.close();
+	        if (connectionToDataBase != null) connectionToDataBase.close();
+	    }
+	    catch (SQLException e) 
+	    {
+	        logMsg("something went wrong closing stmts or connection:  " + e.getLocalizedMessage());
+	    }
 	}
-
+	
 	@Override
 	public List<PhysicianPojo> readAllPhysicians() {
 		logMsg("reading all physicians");
@@ -136,33 +147,135 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	}
 
 	@Override
-	public PhysicianPojo createPhysician(PhysicianPojo physician) {
+	public PhysicianPojo createPhysician(PhysicianPojo physician) 
+	{
 		logMsg("creating a physician");
 		//TODO Complete the insertion of a new physician here
 		//TODO Be sure to use try-and-catch statement
-		return null;
+		
+		try 
+		{
+	        // Set values for the INSERT statement
+	        createPreparedStatement.setString(1, physician.getLastName());
+	        createPreparedStatement.setString(2, physician.getFirstName());
+	        createPreparedStatement.setString(3, physician.getEmail());
+	        createPreparedStatement.setString(4, physician.getPhoneNumber());
+	        createPreparedStatement.setString(5, physician.getSpecialty());
+	        createPreparedStatement.setTimestamp(6, java.sql.Timestamp.valueOf(physician.getCreated()));
+
+	        // Execute the insert statement and retrieve the generated key (ID)
+	        int affectedRows = createPreparedStatement.executeUpdate();
+	        
+	        if (affectedRows == 0) 
+	        	throw new SQLException("Inserting physician failed, no rows affected.");
+	        
+
+	        // Retrieve the generated ID
+	        try (ResultSet generatedKeys = createPreparedStatement.getGeneratedKeys()) 
+	        {
+	            if (generatedKeys.next()) 
+	            	physician.setId(generatedKeys.getInt(1));
+	            else	            
+	                throw new SQLException("Inserting physician failed, no ID obtained.");
+	            
+	        }
+	    } 
+		catch (SQLException e) 
+		{
+	        logMsg("Error creating physician: " + e.getLocalizedMessage());
+	        e.printStackTrace();
+	        return null;  // Return null in case of failure
+	    }
+		
+		return physician;
 	}
 
 	@Override
 	public PhysicianPojo readPhysicianById(int physicianId) {
-		logMsg("read a specific physician");
-		//TODO Complete the retrieval of a specific physician by its id here
-		//TODO Be sure to use try-and-catch statement
-		return null;
+	    logMsg("Reading a specific physician by ID");
+	    PhysicianPojo physician = null;
+
+	    try 
+	    {
+	        // Set the physician ID for the SELECT statement
+	        readByIdPreparedStatement.setInt(1, physicianId);
+
+	        // Execute the query
+	        try (ResultSet resultSet = readByIdPreparedStatement.executeQuery()) 
+	        {
+	            if (resultSet.next()) 
+	            {
+	                physician = new PhysicianPojo();
+	                physician.setId(resultSet.getInt("id"));
+	                physician.setLastName(resultSet.getString("last_name"));
+	                physician.setFirstName(resultSet.getString("first_name"));
+	                physician.setEmail(resultSet.getString("email"));
+	                physician.setPhoneNumber(resultSet.getString("phone"));
+	                physician.setSpecialty(resultSet.getString("specialty"));
+	                // Continue populating the physician object as needed
+	            }
+	        }
+	    } 
+	    catch (SQLException e) 
+	    {
+	        logMsg("Error reading physician: " + e.getLocalizedMessage());
+	        e.printStackTrace();
+	    }
+
+	    return physician;  // Return the physician or null if not found
+	}
+	
+	@Override
+	public void updatePhysician(PhysicianPojo physician) 
+	{
+	    logMsg("Updating a specific physician");
+
+	    try 
+	    {
+	        // Set the values for the UPDATE statement
+	        updatePreparedStatement.setString(1, physician.getFirstName());
+	        updatePreparedStatement.setString(2, physician.getLastName());
+	        updatePreparedStatement.setString(3, physician.getEmail());
+	        updatePreparedStatement.setString(4, physician.getPhoneNumber());
+	        updatePreparedStatement.setString(5, physician.getSpecialty());
+	        updatePreparedStatement.setInt(6, physician.getId());
+
+	        // Execute the update statement
+	        int affectedRows = updatePreparedStatement.executeUpdate();
+	        
+	        if (affectedRows == 0) 
+	            throw new SQLException("Updating physician failed, no rows affected.");
+	        
+	    } 
+	    catch (SQLException e) 
+	    {
+	        logMsg("Error updating physician: " + e.getLocalizedMessage());
+	        e.printStackTrace();
+	    }
 	}
 
 	@Override
-	public void updatePhysician(PhysicianPojo physician) {
-		logMsg("updating a specific physician");
-		//TODO Complete the update of a specific physician here
-		//TODO Be sure to use try-and-catch statement
-	}
+	public void deletePhysicianById(int physicianId) 
+	{
+	    logMsg("Deleting a specific physician by ID");
 
-	@Override
-	public void deletePhysicianById(int physicianId) {
-		logMsg("deleting a specific physician");
-		//TODO Complete the deletion of a specific physician here
-		//TODO Be sure to use try-and-catch statement
+	    try 
+	    {
+	        // Set the ID for the DELETE statement
+	        deleteByIdPreparedStatement.setInt(1, physicianId);
+
+	        // Execute the delete statement
+	        int affectedRows = deleteByIdPreparedStatement.executeUpdate();
+	        
+	        if (affectedRows == 0) 
+	            throw new SQLException("Deleting physician failed, no rows affected.");
+	        
+	    } 
+	    catch (SQLException e) 
+	    {
+	        logMsg("Error deleting physician: " + e.getLocalizedMessage());
+	        e.printStackTrace();
+	    }
 	}
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 import jakarta.faces.context.ExternalContext;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
@@ -37,22 +38,29 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 
 	//TODO Set the value of this string constant properly.  This is the JNDI name
 	//     for the data source.
-	private static final String DATABANK_DS_JNDI = null;
+	private static final String DATABANK_DS_JNDI = "java:comp/env/jdbc/H2Pool"; //I hope this is correct?
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to retrieve the list of physicians from the database.
-	private static final String READ_ALL = null;
+	private static final String READ_ALL = "SELECT id, last_name, first_name, email, phone, specialty "
+							             + "FROM physician";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to retrieve a physician by ID from the database.
-	private static final String READ_PHYSICIAN_BY_ID = null;
+	
+	private static final String READ_PHYSICIAN_BY_ID = "SELECT id, last_name, first_name, email, phone, specialty  "
+													 + "FROM physician "
+													 + "WHERE ID = ?";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to insert a new physician to the database.
-	private static final String INSERT_PHYSICIAN = null;
+	private static final String INSERT_PHYSICIAN = "INSERT INTO physician ( last_name, first_name, email, phone, specialty, created) "
+												 + "VALUES (?, ?, ?, ?, ?, ?)";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to update the fields of a physician in the database.
-	private static final String UPDATE_PHYSICIAN_ALL_FIELDS = null;
+	private static final String UPDATE_PHYSICIAN_ALL_FIELDS = "UPDATE physician (first_name, last_name, email, phone_number, specialty) "
+															+ "VALUES (?, ?, ?, ?, ?)";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to delete a physician from the database.
-	private static final String DELETE_PHYSICIAN_BY_ID = null;
+	private static final String DELETE_PHYSICIAN_BY_ID = "DELETE FROM physicians "
+													   + "WHERE id = ?";
 
 	@Inject
 	protected ExternalContext externalContext;
@@ -63,22 +71,25 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 
 	//TODO Use the proper annotation here so that the correct data source object
 	//     will be injected
+	@Resource(name = "jdbc/H2Pool")
 	protected DataSource databankDS;
 
-	protected Connection conn;
-	protected PreparedStatement readAllPstmt;
-	protected PreparedStatement readByIdPstmt;
-	protected PreparedStatement createPstmt;
-	protected PreparedStatement updatePstmt;
-	protected PreparedStatement deleteByIdPstmt;
+	protected Connection connectionToDataBase;
+	protected PreparedStatement readAllPreparedStatement;
+	protected PreparedStatement readByIdPreparedStatement;
+	protected PreparedStatement createPreparedStatement;
+	protected PreparedStatement updatePreparedStatement;
+	protected PreparedStatement deleteByIdPreparedStatement;
 
 	@PostConstruct
 	protected void buildConnectionAndStatements() {
 		try {
 			logMsg("building connection and stmts");
-			conn = databankDS.getConnection();
-			readAllPstmt = conn.prepareStatement(READ_ALL);
-			createPstmt = conn.prepareStatement(INSERT_PHYSICIAN, RETURN_GENERATED_KEYS);
+			connectionToDataBase = databankDS.getConnection();
+			readAllPreparedStatement = connectionToDataBase.prepareStatement(READ_ALL);
+			createPreparedStatement = connectionToDataBase.prepareStatement(INSERT_PHYSICIAN, RETURN_GENERATED_KEYS);
+			updatePreparedStatement = connectionToDataBase.prepareStatement(UPDATE_PHYSICIAN_ALL_FIELDS);
+			deleteByIdPreparedStatement = connectionToDataBase.prepareStatement(DELETE_PHYSICIAN_BY_ID);
 			//TODO Initialize other PreparedStatements here
 		} catch (Exception e) {
 			logMsg("something went wrong getting connection from database:  " + e.getLocalizedMessage());
@@ -89,10 +100,10 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	protected void closeConnectionAndStatements() {
 		try {
 			logMsg("closing stmts and connection");
-			readAllPstmt.close();
-			createPstmt.close();
+			readAllPreparedStatement.close();
+			createPreparedStatement.close();
 			//TODO Close other PreparedStatements here
-			conn.close();
+			connectionToDataBase.close();
 		} catch (Exception e) {
 			logMsg("something went wrong closing stmts or connection:  " + e.getLocalizedMessage());
 		}
@@ -102,12 +113,16 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	public List<PhysicianPojo> readAllPhysicians() {
 		logMsg("reading all physicians");
 		List<PhysicianPojo> physicians = new ArrayList<>();
-		try (ResultSet rs = readAllPstmt.executeQuery();) {
+		try (ResultSet resultSet = readAllPreparedStatement.executeQuery();) {
 
-			while (rs.next()) {
+			while (resultSet.next()) {
 				PhysicianPojo newPhysician = new PhysicianPojo();
-				newPhysician.setId(rs.getInt("id"));
-				newPhysician.setLastName(rs.getString("last_name"));
+				newPhysician.setId(resultSet.getInt("id"));
+				newPhysician.setLastName(resultSet.getString("last_name"));
+				newPhysician.setFirstName(resultSet.getString("first_name"));
+				newPhysician.setEmail(resultSet.getString("email"));
+				newPhysician.setPhoneNumber(resultSet.getString("phone"));
+				newPhysician.setSpecialty(resultSet.getString("specialty"));
 				//TODO Complete the physician initialization here
 				physicians.add(newPhysician);
 			}

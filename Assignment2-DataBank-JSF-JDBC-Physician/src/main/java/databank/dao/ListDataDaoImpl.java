@@ -15,8 +15,10 @@ import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletContext;
 import javax.sql.DataSource;
 
@@ -26,6 +28,8 @@ import javax.sql.DataSource;
  */
 //TODO Annotate this class so that it becomes a managed bean
 //TODO Provide the proper scope for this managed bean
+@Named
+@SessionScoped
 public class ListDataDaoImpl implements ListDataDao, Serializable {
 	/** Explicitly set serialVersionUID */
 	private static final long serialVersionUID = 1L;

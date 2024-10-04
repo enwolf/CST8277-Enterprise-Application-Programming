@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.annotation.SessionMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -25,7 +25,7 @@ import databank.model.PhysicianPojo;
  */
 
 @Named
-@SessionScoped
+@RequestScoped
 public class PhysicianController implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -64,8 +64,16 @@ public class PhysicianController implements Serializable {
 	public String navigateToAddForm() {
 		//Pay attention to the name here, it will be used as the object name in add-physician.xhtml
 		//ex. <h:inputText value="#{newPhysician.firstName}" id="firstName" />
-		sessionMap.put("newPhysician", new PhysicianPojo());
-		return "add-physician.xhtml?faces-redirect=true";
+		
+		
+	    // Create a new PhysicianPojo for the add form
+	    PhysicianPojo newPhysician = new PhysicianPojo();
+	    
+	    // Store this new object in the session map for the form to bind to
+	    sessionMap.put("newPhysician", newPhysician);
+	    
+	    // Navigate to the add-physician.xhtml page
+	    return "/add-physician.xhtml?faces-redirect=true";
 	}
 
 	public String submitPhysician(PhysicianPojo physician) {
@@ -94,7 +102,7 @@ public class PhysicianController implements Serializable {
 	    sessionMap.put("editPhysician", physicianToUpdate);
 	    
 	    // Navigate to the update form
-	    return "edit-physician.xhtml?faces-redirect=true";
+	    return "/edit-physician.xhtml?faces-redirect=true";
 	}
 
 	public String submitUpdatedPhysician(PhysicianPojo physician) {
@@ -118,5 +126,7 @@ public class PhysicianController implements Serializable {
 	    // Redirect the user back to the list of physicians
 	    return "list-physicians.xhtml?faces-redirect=true";
 	}
+	
+	
 
 }

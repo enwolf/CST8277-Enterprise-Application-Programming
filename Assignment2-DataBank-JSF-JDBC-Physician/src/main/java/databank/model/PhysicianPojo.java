@@ -27,7 +27,7 @@ public class PhysicianPojo implements Serializable {
 	protected String lastName;
 	protected String firstName;
 	protected String email;
-	protected String phoneNumber;
+	protected String phone;
 	protected String specialty;
 	protected LocalDateTime created;
 
@@ -59,7 +59,7 @@ public class PhysicianPojo implements Serializable {
 	}
 
 	public String getPhoneNumber() {
-		return phoneNumber;
+		return phone;
 	}
 
 	public String getSpecialty() {
@@ -97,7 +97,7 @@ public class PhysicianPojo implements Serializable {
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
+		this.phone = phoneNumber;
 	}
 
 	public void setSpecialty(String specialty) {
@@ -169,4 +169,4 @@ public class PhysicianPojo implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-}
+} 

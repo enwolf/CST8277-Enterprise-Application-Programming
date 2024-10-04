@@ -20,6 +20,7 @@ import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.inject.Inject;
@@ -35,7 +36,7 @@ import databank.model.PhysicianPojo;
  */
 //TODO Don't forget this is a managed bean with an application scope
 @Named
-@SessionScoped
+@RequestScoped
 public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	/** Explicitly set serialVersionUID */
 	private static final long serialVersionUID = 1L;
@@ -87,22 +88,21 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	protected PreparedStatement deleteByIdPreparedStatement;
 
 	@PostConstruct
-	protected void buildConnectionAndStatements() 
-	{
-		try 
-		{
-			logMsg("building connection and stmts");
-			connectionToDataBase = databankDS.getConnection();
-			readAllPreparedStatement = connectionToDataBase.prepareStatement(READ_ALL);
-			createPreparedStatement = connectionToDataBase.prepareStatement(INSERT_PHYSICIAN, RETURN_GENERATED_KEYS);
-			updatePreparedStatement = connectionToDataBase.prepareStatement(UPDATE_PHYSICIAN_ALL_FIELDS);
-			deleteByIdPreparedStatement = connectionToDataBase.prepareStatement(DELETE_PHYSICIAN_BY_ID);
-			//TODO Initialize other PreparedStatements here
-		} 
-		catch (Exception e) 
-		{
-			logMsg("something went wrong getting connection from database:  " + e.getLocalizedMessage());
-		}
+	protected void buildConnectionAndStatements() {
+	    try {
+	        logMsg("building connection and stmts");
+	        connectionToDataBase = databankDS.getConnection();
+	        readAllPreparedStatement = connectionToDataBase.prepareStatement(READ_ALL);
+	        createPreparedStatement = connectionToDataBase.prepareStatement(INSERT_PHYSICIAN, RETURN_GENERATED_KEYS);
+	        updatePreparedStatement = connectionToDataBase.prepareStatement(UPDATE_PHYSICIAN_ALL_FIELDS);
+	        deleteByIdPreparedStatement = connectionToDataBase.prepareStatement(DELETE_PHYSICIAN_BY_ID);
+	        
+	        // Initialize the readByIdPreparedStatement as well
+	        readByIdPreparedStatement = connectionToDataBase.prepareStatement(READ_PHYSICIAN_BY_ID);
+
+	    } catch (Exception e) {
+	        logMsg("something went wrong getting connection from database: " + e.getLocalizedMessage());
+	    }
 	}
 
 	@PreDestroy

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.annotation.SessionMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -42,6 +43,8 @@ public class PhysicianController implements Serializable {
 	private ListDataDao listDataDao;
 
 	private List<PhysicianPojo> physicians;
+	
+    
 
 	//Necessary methods to make controller work
 
@@ -80,15 +83,26 @@ public class PhysicianController implements Serializable {
 		//TODO Update the physician object with current date here.  You can use LocalDateTime::now().
 		//TODO Use DAO to insert the physician to the database
 		//TODO Do not forget to navigate the user back to list-physicians.xhtml
-	    
-		// Set the created date to now
+		  // Update the physician object with the current date and time
 	    physician.setCreated(java.time.LocalDateTime.now());
 	    
-	    // Use DAO to insert the new physician into the database
-	    physicianDao.createPhysician(physician);
+	    // Use the DAO to insert the physician into the database
+	    try {
+	        physicianDao.createPhysician(physician);
+	        // Log a message indicating the physician was created successfully
+	        
+	    } catch (Exception e) {
+	        // Log an error message if something goes wrong during the creation process
+	        
+	        e.printStackTrace();
+	        // Return null or handle the error as appropriate for your application
+	        return null;
+	    }
 	    
-	    // Redirect the user back to the list of physicians
+	    // Redirect the user back to the list of physicians page after successful submission
 	    return "list-physicians.xhtml?faces-redirect=true";
+
+	    
 	}
 
 	public String navigateToUpdateForm(int physicianId) {

@@ -53,7 +53,8 @@
     <br />
     <h:form>
        <!-- JavaScript onclick-handler cannot use 'map-style' uiconsts['something'], use 'properties-style'  -->
-       <h:commandButton value="#{uiconsts['addButtonLabel']}" action="#{physicianController.navigateToUpdateForm(physician.id)}" />
+     	<h:commandButton value="#{uiconsts['addButtonLabel']}" action="#{physicianController.navigateToAddForm}" />
+
        <p/>
        <h:dataTable value="#{physicianController.physicians}" var="physician"
          styleClass="table table-hover">

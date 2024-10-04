@@ -53,7 +53,7 @@
     <br />
     <h:form>
        <!-- JavaScript onclick-handler cannot use 'map-style' uiconsts['something'], use 'properties-style'  -->
-       <h:commandButton value="#{uiconsts['addButtonLabel']}" action="alert('Not Yet Implemented');" />
+       <h:commandButton value="#{uiconsts['addButtonLabel']}" action="#{physicianController.navigateToUpdateForm(physician.id)}" />
        <p/>
        <h:dataTable value="#{physicianController.physicians}" var="physician"
          styleClass="table table-hover">
@@ -91,7 +91,7 @@
          -->
          <h:column>
            <f:facet name="header">#{uiconsts['columnLabel_Action']}</f:facet>
-           <h:commandButton value="#{uiconsts['editButtonLabel']}" onclick = "alert('Not Yet Implemented');" />
+           <h:commandButton value="#{uiconsts['editButtonLabel']}"  action="#{physicianController.navigateToUpdateForm(physician.id)}" />
            &#160;
            <h:commandButton value="#{uiconsts['deleteButtonLabel']}"
              onclick="if (!confirm('#{uiconsts.rus}')) return false"

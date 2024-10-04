@@ -20,8 +20,10 @@ import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletContext;
 import javax.sql.DataSource;
 
@@ -32,6 +34,8 @@ import databank.model.PhysicianPojo;
  * Description:  Implements the C-R-U-D API for the database
  */
 //TODO Don't forget this is a managed bean with an application scope
+@Named
+@SessionScoped
 public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	/** Explicitly set serialVersionUID */
 	private static final long serialVersionUID = 1L;
@@ -41,7 +45,7 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	private static final String DATABANK_DS_JNDI = "java:comp/env/jdbc/H2Pool"; //I hope this is correct?
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to retrieve the list of physicians from the database.
-	private static final String READ_ALL = "SELECT id, last_name, first_name, email, phone, specialty "
+	private static final String READ_ALL = "SELECT id, last_name, first_name, email, phone, specialty, created "
 							             + "FROM physician";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to retrieve a physician by ID from the database.
@@ -56,7 +60,7 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to update the fields of a physician in the database.
 	private static final String UPDATE_PHYSICIAN_ALL_FIELDS = "UPDATE physician "
-														    + "SET first_name = ?, last_name = ?, email = ?, phone_number = ?, specialty = ? "
+														    + "SET first_name = ?, last_name = ?, email = ?, phone = ?, specialty = ? "
 														    + "WHERE id = ?";
 	//TODO Set the value of this string constant properly.  This is the SQL
 	//     statement to delete a physician from the database.
@@ -135,6 +139,7 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 				newPhysician.setPhoneNumber(resultSet.getString("phone"));
 				newPhysician.setSpecialty(resultSet.getString("specialty"));
 				//TODO Complete the physician initialization here
+				newPhysician.setCreated(resultSet.getTimestamp("created").toLocalDateTime());
 				physicians.add(newPhysician);
 			}
 			

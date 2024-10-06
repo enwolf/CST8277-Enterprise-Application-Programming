@@ -26,7 +26,7 @@ import databank.model.PhysicianPojo;
  */
 
 @Named
-@RequestScoped
+@SessionScoped
 public class PhysicianController implements Serializable {
 	private static final long serialVersionUID = 1L;
 

@@ -1,7 +1,18 @@
-/*********************************************************************************************************
- * File:  ListDataDaoImpl.java Course Materials CST8277
- *
- * @author Teddy Yap
+/**
+ * This file contains the implementation of the ListDataDao interface, which provides
+ * data access functionality for retrieving lists of specialty data from the database.
+ * The class uses JDBC to perform database operations, managing connections and 
+ * prepared statements in a session or request-scoped environment.
+ * 
+ * The file also includes lifecycle methods for establishing and closing database connections 
+ * using the Jakarta EE annotations {@code @PostConstruct} and {@code @PreDestroy}.
+ * Logging is performed via the servlet context's logging mechanism to track 
+ * significant events in the application flow.
+ * 
+ * @file ListDataDaoImpl.java
+ * @version 1.0
+ * @since 2024-10-04
+ * @author Robin Phillis
  */
 package databank.dao;
 
@@ -17,70 +28,88 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.ServletContext;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-@SuppressWarnings("unused")
 /**
- * Description:  API for reading list data from the database
+ * Implementation of the {@link ListDataDao} interface, responsible for performing 
+ * data retrieval operations for specialty data from the database. This class is 
+ * request-scoped, meaning a new instance is created for each HTTP request.
+ * 
+ * The class establishes a connection to the database using JDBC and retrieves
+ * specialty information via SQL queries. It manages the connection and 
+ * PreparedStatements lifecycle through the use of {@code @PostConstruct} 
+ * and {@code @PreDestroy} annotations to ensure resources are properly 
+ * allocated and released.
+ * 
+ * Logging is done using the servlet context's logging facility, which helps in 
+ * diagnosing errors and tracking significant actions in the code.
+ * 
+ * @author Robin Phillis
+ * @version 1.0
+ * @since 2024-10-04
  */
-//TODO Annotate this class so that it becomes a managed bean
-//TODO Provide the proper scope for this managed bean
 @Named
 @RequestScoped
 public class ListDataDaoImpl implements ListDataDao, Serializable {
-	/** Explicitly set serialVersionUID */
-	private static final long serialVersionUID = 1L;
 
-	//TODO Set the value of this string constant properly.  This is the JNDI name
-	//     for the data source.
-	private static final String DATABANK_DS_JNDI = "java:app/jdbc/databank";;
-	//TODO Set the value of this string constant properly.  This is the SQL
-	//     statement to retrieve the list of specialties from the database.
+	private static final long serialVersionUID = 1L;
+	private static final String DATABANK_DS_JNDI = "java:app/jdbc/databank";
 	private static final String READ_ALL_SPECIALTIES = "SELECT name FROM specialty";
 
 	@Inject
 	protected ExternalContext externalContext;
 
-	private void logMsg(String msg) {
-		((ServletContext) externalContext.getContext()).log(msg);
-	}
-
-	//TODO Use the proper annotation here so that the correct data source object
-	//     will be injected
 	@Resource(name = "java:app/jdbc/databank")
 	protected DataSource databankDS;
 	protected Connection connectionToDatabase;
 	protected PreparedStatement readAllSpecialtiesPreparedStatement;
 
-	@PostConstruct
-	protected void buildConnectionAndStatements() {
-	    try {
-	        logMsg("Attempting to get connection from data source.");
+	/**
+	 * Logs messages to the server log using the {@link ServletContext}.
+	 * 
+	 * @param msg the message to be logged.
+	 */
+	private void logMsg(String msg) 
+	{
+		((ServletContext) externalContext.getContext()).log(msg);
+	}
 
-	        // Establish the connection
+	/**
+	 * Initializes the database connection and prepares the SQL statement 
+	 * for reading all specialties from the database. This method is 
+	 * annotated with {@code @PostConstruct} to ensure it is executed 
+	 * after the bean's construction and dependency injection.
+	 */
+	@PostConstruct
+	protected void buildConnectionAndStatements() 
+	{
+	    try 
+	    {
+	        logMsg("Attempting to get connection from data source.");
 	        connectionToDatabase = databankDS.getConnection();
 	        logMsg("Connection established successfully.");
-
-	        // Initialize the PreparedStatement
+	        
 	        readAllSpecialtiesPreparedStatement = connectionToDatabase.prepareStatement(READ_ALL_SPECIALTIES);
 	        logMsg("PreparedStatement initialized successfully.");
 
-	    } catch (Exception e) {
+	    } 
+	    catch (Exception e) 
+	    {
 	        logMsg("Something went wrong getting connection from database: " + e.getLocalizedMessage());
-	        e.printStackTrace();  // Ensure stack trace shows the root cause
+	        e.printStackTrace();  
 	    }
 	}
-	
-	
 
+	/**
+	 * Closes the database connection and the PreparedStatement. This method is 
+	 * annotated with {@code @PreDestroy} to ensure that resources are released 
+	 * before the bean is destroyed at the end of the request lifecycle.
+	 */
 	@PreDestroy
 	protected void closeConnectionAndStatements() 
 	{
@@ -88,8 +117,11 @@ public class ListDataDaoImpl implements ListDataDao, Serializable {
 		{
 			logMsg("closing stmts and connection");
 			
-			if (readAllSpecialtiesPreparedStatement != null) readAllSpecialtiesPreparedStatement.close();
-			connectionToDatabase.close();
+			if (readAllSpecialtiesPreparedStatement != null) 
+				readAllSpecialtiesPreparedStatement.close();
+			
+			if (connectionToDatabase != null)
+				connectionToDatabase.close();
 		} 
 		catch (Exception e) 
 		{
@@ -97,10 +129,19 @@ public class ListDataDaoImpl implements ListDataDao, Serializable {
 		}
 	}
 
+	/**
+	 * Reads all specialties from the database by executing the 
+	 * {@code readAllSpecialtiesPreparedStatement}. It returns 
+	 * a list of specialties' names as strings.
+	 * 
+	 * @return a list of strings representing the specialties.
+	 */
 	@Override
-	public List<String> readAllSpecialties() {
+	public List<String> readAllSpecialties() 
+	{
 	    logMsg("reading all specialties");
 	    List<String> specialties = new ArrayList<>();
+	
 	    try (ResultSet resultSet = readAllSpecialtiesPreparedStatement.executeQuery()) 
 	    {
 	        while (resultSet.next()) 
@@ -114,5 +155,4 @@ public class ListDataDaoImpl implements ListDataDao, Serializable {
 	    }
 	    return specialties;
 	}
-
 }

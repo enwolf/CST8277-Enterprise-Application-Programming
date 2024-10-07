@@ -1,9 +1,18 @@
-/*********************************************************************************************************
- * File:  PhysicianPojo.java Course Materials CST8277
- *
- * @author Teddy Yap
- * @author Shariar (Shawn) Emami
- * @author (original) Mike Norman
+/**
+ * This file contains the model class PhysicianPojo, which represents a physician entity
+ * in the application. The class holds key details such as the physician's name, contact 
+ * information, specialty, and the date the record was created. It is used in conjunction 
+ * with the PhysicianController and PhysicianDao for handling CRUD operations and 
+ * representing the physician's data in various views.
+ * 
+ * The class is serializable to support the transfer of data across different layers of 
+ * the application, particularly within session and view scopes. It uses Jakarta EE 
+ * annotations to manage the scope of the data between views.
+ * 
+ * @file PhysicianPojo.java
+ * @version 1.0
+ * @since 2024-10-04
+ * @author Robin Phillis
  */
 package databank.model;
 
@@ -14,15 +23,27 @@ import java.util.Objects;
 import jakarta.faces.view.ViewScoped;
 
 /**
- *
- * Description:  Model for the Physician object <br>
- * A little read about @ViewScoped <br>
- * https://stackoverflow.com/a/6026009/764951
+ * Represents a physician entity in the application, containing details such as 
+ * the physician's ID, first name, last name, email, phone number, specialty, 
+ * and the creation date of the record. This class is used to encapsulate physician 
+ * data in various operations across the application, particularly in the context 
+ * of CRUD operations.
+ * 
+ * The class is annotated with {@code @ViewScoped}, ensuring that the data persists 
+ * across multiple HTTP requests during the same JSF view. The class implements 
+ * {@code Serializable} to allow the physician data to be transferred and stored 
+ * efficiently across different layers of the application.
+ * 
+ * The class overrides {@code equals()}, {@code hashCode()}, and {@code toString()} 
+ * methods to ensure that physician objects can be compared, hashed, and printed 
+ * correctly.
  */
+
 @ViewScoped
 public class PhysicianPojo implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	// Physician attributes
 	protected int id;
 	protected String lastName;
 	protected String firstName;
@@ -31,142 +52,164 @@ public class PhysicianPojo implements Serializable {
 	protected String specialty;
 	protected LocalDateTime created;
 
-	public PhysicianPojo() {
+	/**
+	 * Default constructor, creates an empty physician object.
+	 */
+	public PhysicianPojo() 
+	{
 		super();
 	}
 
-	// Getters
-	public int getId() {
+	/**
+	 * Getters for accessing physician attributes.
+	 * These methods return the current values of the physician's ID, first name, 
+	 * last name, email, phone number, specialty, and the date the record was created.
+	 * 
+	 * @return the respective attribute of the physician.
+	 */
+	public int getId() 
+	{
 		return id;
 	}
 
-	/**
-	 * @return the value for firstName
-	 */
-	public String getFirstName() {
+	public String getFirstName() 
+	{
 		return firstName;
 	}
 
-	/**
-	 * @return the value for lastName
-	 */
-	public String getLastName() {
+	public String getLastName() 
+	{
 		return lastName;
 	}
 
-	public String getEmail() {
+	public String getEmail() 
+	{
 		return email;
 	}
 
-	public String getPhoneNumber() {
+	public String getPhoneNumber() 
+	{
 		return phone;
 	}
 
-	public String getSpecialty() {
+	public String getSpecialty() 
+	{
 		return specialty;
 	}
 
-	public LocalDateTime getCreated() {
+	public LocalDateTime getCreated() 
+	{
 		return created;
 	}
 
-	// Setters
 	/**
-	 * @param id new value for id
+	 * Setters for modifying physician attributes.
+	 * These methods allow modification of the physician's ID, first name, 
+	 * last name, email, phone number, specialty, and the date the record was created.
+	 * 
+	 * @param value the new value to be assigned to the respective attribute.
 	 */
-	public void setId(int id) {
+	public void setId(int id) 
+	{
 		this.id = id;
 	}
 
-	/**
-	 * @param firstName new value for firstName
-	 */
-	public void setFirstName(String firstName) {
+	public void setFirstName(String firstName) 
+	{
 		this.firstName = firstName;
 	}
 
-	/**
-	 * @param lastName new value for lastName
-	 */
-	public void setLastName(String lastName) {
+	public void setLastName(String lastName) 
+	{
 		this.lastName = lastName;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(String email) 
+	{
 		this.email = email;
 	}
 
-	public void setPhoneNumber(String phoneNumber) {
+	public void setPhoneNumber(String phoneNumber) 
+	{
 		this.phone = phoneNumber;
 	}
 
-	public void setSpecialty(String specialty) {
+	public void setSpecialty(String specialty) 
+	{
 		this.specialty = specialty;
 	}
 
-	public void setCreated(LocalDateTime created) {
+	public void setCreated(LocalDateTime created) 
+	{
 		this.created = created;
 	}
 
-	// Use getter's for member variables
+	/**
+	 * Generates a hash code for the physician object based on the physician's ID.
+	 * This method is used to ensure that physician objects can be hashed correctly
+	 * in collections such as hash tables.
+	 * 
+	 * @return the hash code value for the physician object.
+	 */
 	@Override
-	public int hashCode() {
+	public int hashCode() 
+	{
 		final int prime = 31;
 		int result = super.hashCode();
-		// Only include member variables that really contribute to an object's identity
-		// i.e. if variables like version/updated/name/etc. change throughout an object's lifecycle,
-		// they shouldn't be part of the hashCode calculation
 		return prime * result + Objects.hash(getId());
 	}
 
+	/**
+	 * Compares this physician object to another object to determine equality.
+	 * Two physician objects are considered equal if they have the same ID.
+	 * 
+	 * @param obj the object to compare to this physician.
+	 * @return {@code true} if the two objects are equal, {@code false} otherwise.
+	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object obj) 
+	{
+		if (this == obj) 
 			return true;
-		}
-		if (obj == null) {
+		
+		if (obj == null) 
 			return false;
-		}
-
-		/* enhanced instanceof - yeah!
-		 * As of JDK 14, no need for additional 'silly' cast:
-		    if (animal instanceof Cat) {
-		        Cat cat = (Cat) animal;
-		        cat.meow();
-                // Other class Cat operations ...
-            }
-         * Technically, 'otherPhysicianPojo' is a <i>pattern</i> that becomes an in-scope variable binding.
-         * Note:  Need to watch out just-in-case there is already a 'otherPhysicianPojo' variable in-scope!
-		 */
-		if (obj instanceof PhysicianPojo otherPhysicianPojo) {
-			// See comment (above) in hashCode():  Compare using only member variables that are
-			// truly part of an object's identity
+		
+		if (obj instanceof PhysicianPojo otherPhysicianPojo) 
 			return Objects.equals(this.getId(), otherPhysicianPojo.getId());
-		}
+		
 		return false;
 	}
 
+	/**
+	 * Returns a string representation of the physician object, containing key
+	 * attributes such as ID, first name, last name, email, phone number, and specialty.
+	 * This method is useful for debugging and logging purposes.
+	 * 
+	 * @return a string representation of the physician object.
+	 */
 	@Override
-	public String toString() {
+	public String toString() 
+	{
 		StringBuilder builder = new StringBuilder();
 		builder.append("Physician [id = ").append(getId()).append(", ");
-		if (getFirstName() != null) {
+		
+		if (getFirstName() != null) 
 			builder.append("firstName = ").append(getFirstName()).append(", ");
-		}
-		if (getLastName() != null) {
+		
+		if (getLastName() != null) 
 			builder.append("lastName = ").append(getLastName()).append(", ");
-		}
-		if (getEmail() != null) {
+		
+		if (getEmail() != null) 
 			builder.append("email = ").append(getEmail()).append(", ");
-		}
-		if (getPhoneNumber() != null) {
+		
+		if (getPhoneNumber() != null) 
 			builder.append("phoneNumber = ").append(getPhoneNumber()).append(", ");
-		}
-		if (getSpecialty() != null) {
+		
+		if (getSpecialty() != null) 
 			builder.append("specialty = ").append(getSpecialty()).append(", ");
-		}
-		//TODO Add code to append the specialty field
+				
 		builder.append("]");
 		return builder.toString();
 	}
-} 
+}

@@ -17,11 +17,14 @@ import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.persistence.Version;
 
 /**
  * TODO 14.1 - Complete the @Entity with correct name.<br>
@@ -36,195 +39,332 @@ import jakarta.persistence.Table;
  * working with.<br>
  * TODO 20 - Dates (LocalDateTime) are to be mapped and 'editable' field is not to be mapped.
  */
+
+
+/**
+ * Represents a physician entity in the databank system.
+ * This class is a JPA entity used for database persistence and includes fields
+ * for tracking physician details such as name, contact information, and timestamps.
+ * <p>
+ * It includes annotations for JPA mappings and named queries.
+ * </p>
+ *
+ * @author Robin Phillis
+ * @version 1.0
+ * @since 11/10/2024
+ */
 @ViewScoped
-@Entity(name = "some-name")
-@Table(name = "some-name", catalog = "databank", schema = "")
-@Access(AccessType.SOME_TYPE)
-@NamedQuery(name = PhysicianPojo.PHYSICIAN_FIND_ALL, query = "SELECT something")
-@NamedQuery(name = PhysicianPojo.PHYSICIAN_FIND_ID, query = "SELECT something")
+@Entity(name = "Physician")
+@Table(name = "physician", catalog = "databank", schema = "databank")
+@Access(AccessType.FIELD)
+@EntityListeners(PhysicianPojoListener.class)
+@NamedQuery(name = PhysicianPojo.PHYSICIAN_FIND_ALL, query = "SELECT p FROM Physician p")
+@NamedQuery(name = PhysicianPojo.PHYSICIAN_FIND_ID, query = "SELECT p FROM Physician p WHERE p.id = :id")
 public class PhysicianPojo implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final String PHYSICIAN_FIND_ALL = "Physician.findAll";
-	public static final String PHYSICIAN_FIND_ID = "Physician.findById";
+    /** Query constant to find all physicians. */
+    public static final String PHYSICIAN_FIND_ALL = "Physician.findAll";
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	protected int id;
+    /** Query constant to find a physician by ID. */
+    public static final String PHYSICIAN_FIND_ID = "Physician.findById";
 
-	protected String lastName;
-	
-	protected String firstName;
+    /** The unique identifier for a physician. */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    protected int id;
 
-	protected String email;
+    /** The last name of the physician. */
+    @Basic
+    @Column(name = "last_name")
+    protected String lastName;
 
-	protected String phoneNumber;
+    /** The first name of the physician. */
+    @Basic
+    @Column(name = "first_name")
+    protected String firstName;
 
-	protected LocalDateTime created;
+    /** The email address of the physician. */
+    @Basic
+    @Column(name = "email")
+    protected String email;
 
-	protected LocalDateTime updated;
+    /** The phone number of the physician. */
+    @Basic
+    @Column(name = "phone")
+    protected String phoneNumber;
 
-	protected int version = 1;
+    /** The creation timestamp of the physician record. */
+    @Basic
+    @Column(name = "created", updatable = false)
+    protected LocalDateTime created;
 
-	protected boolean editable;
+    /** The last updated timestamp of the physician record. */
+    @Basic
+    @Column(name = "updated")
+    protected LocalDateTime updated;
 
-	public PhysicianPojo() {
-		super();
-	}
-	
-	public boolean getEditable() {
-		return editable;
-	}
-	
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-	}
+    /** The specialty of the physician. */
+    @Column(name = "specialty")
+    protected String specialty;
 
-	public int getId() {
-		return id;
-	}
-	
-	/**
-	 * @param id new value for id
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+    /** The version number for optimistic locking. */
+    @Version
+    @Column(name = "version")
+    protected int version;
 
-	/**
-	 * @return the value for lastName
-	 */
-	public String getLastName() {
-		return lastName;
-	}
+    /** A transient field indicating if the physician is editable (not persisted). */
+    @Transient
+    protected boolean editable;
 
-	/**
-	 * @param lastName new value for lastName
-	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    /** Default constructor. */
+    public PhysicianPojo() {
+        super();
+    }
 
-	/**
-	 * @return the value for firstName
-	 */
-	public String getFirstName() {
-		return firstName;
-	}
+    /**
+     * Gets the ID of the physician.
+     *
+     * @return the physician ID.
+     */
+    public int getId() {
+        return id;
+    }
 
-	/**
-	 * @param firstName new value for firstName
-	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    /**
+     * Sets the ID of the physician.
+     *
+     * @param id the new physician ID.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getEmail() {
-		return email;
-	}
-	
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    /**
+     * Gets the last name of the physician.
+     *
+     * @return the last name.
+     */
+    public String getLastName() {
+        return lastName;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-	
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    /**
+     * Sets the last name of the physician.
+     *
+     * @param lastName the new last name.
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public LocalDateTime getCreated() {
-		return created;
-	}
-	
-	public void setCreated(LocalDateTime created) {
-		this.created = created;
-	}
+    /**
+     * Gets the first name of the physician.
+     *
+     * @return the first name.
+     */
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public LocalDateTime getUpdated() {
-		return updated;
-	}
-	
-	public void setUpdated(LocalDateTime updated) {
-		this.updated = updated;
-	}
+    /**
+     * Sets the first name of the physician.
+     *
+     * @param firstName the new first name.
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public int getVersion() {
-		return version;
-	}
-	
-	public void setVersion(int version) {
-		this.version = version;
-	}
+    /**
+     * Gets the email address of the physician.
+     *
+     * @return the email address.
+     */
+    public String getEmail() {
+        return email;
+    }
 
-	/**
-	 * Very important:  Use getter's for member variables because JPA sometimes needs to intercept those calls<br/>
-	 * and go to the database to retrieve the value.
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		// Only include member variables that really contribute to an object's identity
-		// i.e. if variables like version/updated/name/etc. change throughout an object's lifecycle,
-		// they shouldn't be part of the hashCode calculation
-		return prime * result + Objects.hash(getId());
-	}
+    /**
+     * Sets the email address of the physician.
+     *
+     * @param email the new email address.
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
+    /**
+     * Gets the phone number of the physician.
+     *
+     * @return the phone number.
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-		/* Enhanced instanceof - yeah!
-		 * As of JDK 14, no need for additional 'silly' cast:
-		    if (animal instanceof Cat) {
-		        Cat cat = (Cat) animal;
-		        cat.meow();
-                // Other class Cat operations ...
-            }
-         * Technically, 'otherPhysicianPojo' is a <i>pattern</i> that becomes an in-scope variable binding.
-         * Note:  Need to watch out just-in-case there is already a 'otherPhysicianPojo' variable in-scope!
-		 */
-		if (obj instanceof PhysicianPojo otherPhysicianPojo) {
-			// See comment (above) in hashCode():  compare using only member variables that are
-			// truly part of an object's identity.
-			return Objects.equals(this.getId(), otherPhysicianPojo.getId());
-		}
-		return false;
-	}
+    /**
+     * Sets the phone number of the physician.
+     *
+     * @param phoneNumber the new phone number.
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Physician [id = ").append(getId());
-		if (getLastName() != null) {
-			builder.append(", ").append("lastName = ").append(getLastName());
-		}
-		if (getFirstName() != null) {
-			builder.append(", ").append("firstName = ").append(getFirstName());
-		}
-		if (getPhoneNumber() != null) {
-			builder.append(", ").append("phoneNumber = ").append(getPhoneNumber());
-		}
-		if (getEmail() != null) {
-			builder.append(", ").append("email = ").append(getEmail());
-		}
-		if (getCreated() != null) {
-			builder.append(", ").append("created = ").append(getCreated());
-		}
-		if (getUpdated() != null) {
-			builder.append(", ").append("updated = ").append(getUpdated());
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+    /**
+     * Gets the creation timestamp of the physician record.
+     *
+     * @return the creation timestamp.
+     */
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    /**
+     * Sets the creation timestamp of the physician record.
+     *
+     * @param created the new creation timestamp.
+     */
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
+    }
+
+    /**
+     * Gets the last updated timestamp of the physician record.
+     *
+     * @return the updated timestamp.
+     */
+    public LocalDateTime getUpdated() {
+        return updated;
+    }
+
+    /**
+     * Sets the last updated timestamp of the physician record.
+     *
+     * @param updated the new updated timestamp.
+     */
+    public void setUpdated(LocalDateTime updated) {
+        this.updated = updated;
+    }
+
+    /**
+     * Gets the version number for optimistic locking.
+     *
+     * @return the version number.
+     */
+    public int getVersion() {
+        return version;
+    }
+
+    /**
+     * Sets the version number for optimistic locking.
+     *
+     * @param version the new version number.
+     */
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    /**
+     * Gets the specialty of the physician.
+     *
+     * @return the specialty.
+     */
+    public String getSpecialty() {
+        return specialty;
+    }
+
+    /**
+     * Sets the specialty of the physician.
+     *
+     * @param specialty the new specialty.
+     */
+    public void setSpecialty(String specialty) {
+        this.specialty = specialty;
+    }
+
+    /**
+     * Checks if the physician is editable.
+     *
+     * @return true if editable, false otherwise.
+     */
+    public boolean getEditable() {
+        return editable;
+    }
+
+    /**
+     * Sets the editable state of the physician.
+     *
+     * @param editable the new editable state.
+     */
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    /**
+     * Generates a hash code for the physician entity.
+     *
+     * @return the hash code.
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        return prime * Objects.hash(getId());
+    }
+
+    /**
+     * Checks if this PhysicianPojo object is equal to another object.
+     *
+     * @param obj the object to compare with.
+     * @return true if the objects are the same or have the same ID, false otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        PhysicianPojo otherPhysicianPojo = (PhysicianPojo) obj;
+        return Objects.equals(this.getId(), otherPhysicianPojo.getId());
+    }
+
+    /**
+     * Returns a string representation of the PhysicianPojo object.
+     *
+     * @return a string containing the physician's details, including ID, name, phone number, email, specialty, and timestamps.
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Physician [id = ").append(getId());
+        if (getLastName() != null) {
+            builder.append(", lastName = ").append(getLastName());
+        }
+        if (getFirstName() != null) {
+            builder.append(", firstName = ").append(getFirstName());
+        }
+        if (getPhoneNumber() != null) {
+            builder.append(", phoneNumber = ").append(getPhoneNumber());
+        }
+        if (getEmail() != null) {
+            builder.append(", email = ").append(getEmail());
+        }
+        if (getSpecialty() != null) {
+            builder.append(", specialty = ").append(getSpecialty());
+        }
+        if (getCreated() != null) {
+            builder.append(", created = ").append(getCreated());
+        }
+        if (getUpdated() != null) {
+            builder.append(", updated = ").append(getUpdated());
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 
 }

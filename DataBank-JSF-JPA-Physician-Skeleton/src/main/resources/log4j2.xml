@@ -13,9 +13,9 @@
         </Console>
     </Appenders>
     
-    <Loggers>
-        <!-- Hibernate is VERY verbose ... the following 3 appenders should be enough -->
-        <Logger name="org.hibernate.SQL" level="debug" additivity="false">
+ <Loggers>
+        <!-- Hibernate logging -->
+        <Logger name="org.hibernate.SQL" level="trace" additivity="false">
             <AppenderRef ref="Console-Appender" />
         </Logger>
         <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace" additivity="false">
@@ -25,12 +25,13 @@
             <AppenderRef ref="Console-Appender" />
         </Logger>
         
-        <Logger name="bloodbank" level="debug" additivity="false">
+        <!-- Custom application logging -->
+        <Logger name="bloodbank" level="trace" additivity="false">
             <AppenderRef ref="Console-Appender" />
         </Logger>
 
-        <!-- default logging should only warn us -->
-        <Root level="warn">
+        <!-- Root logger set to show all logs -->
+        <Root level="all">
             <AppenderRef ref="Console-Appender" />
         </Root>
     </Loggers>

@@ -35,8 +35,38 @@ import databank.model.PhysicianPojo;
 @Named
 @ApplicationScoped
 public class PhysicianDaoImpl implements PhysicianDao, Serializable {
+
+	@Override
+	public List<PhysicianPojo> readAllPhysicians() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PhysicianPojo createPhysician(PhysicianPojo physician) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PhysicianPojo readPhysicianById(int physicianId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PhysicianPojo updatePhysician(PhysicianPojo physician) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deletePhysicianById(int physicianId) {
+		// TODO Auto-generated method stub
+		
+	}
 	/** explicitly set serialVersionUID */
-	private static final long serialVersionUID = 1L;
+	/*private static final long serialVersionUID = 1L;
 
 	//Get the log4j2 logger for this class
 	private static final Logger LOG = LogManager.getLogger();
@@ -81,6 +111,6 @@ public class PhysicianDaoImpl implements PhysicianDao, Serializable {
 			em.refresh(physician);
 			em.remove(physician);
 		}
-	}
+	}*/
 
-}
+} 

@@ -1,18 +1,8 @@
-/********************************************************************************************************2*4*w*
- * File:  ListDataDaoImpl.java Course Materials CST8277
- *
- * @author Teddy Yap
- */
 package databank.dao;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -22,45 +12,62 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import jakarta.servlet.ServletContext;
 
-@SuppressWarnings("unused")
 /**
- * Description:  API for reading list data from the database
+ * Implementation of the ListDataDao interface for reading list data from the database.
+ * Provides methods to read a list of specialties.
+ * 
+ * @author Robin Phillis
+ * @version 1.0
+ * @since 11/10/2024
  */
 @Named
 @ApplicationScoped
 public class ListDataDaoImpl implements ListDataDao, Serializable {
-	/** Explicitly set serialVersionUID */
-	private static final long serialVersionUID = 1L;
+    /** Explicitly set serialVersionUID */
+    private static final long serialVersionUID = 1L;
 
-	//TODO 01 - Set the value of this string constant properly.  This is the query
-	//          to retrieve the list of specialties from the database.
-	private static final String READ_ALL_SPECIALTIES = null;
+    /** SQL query to read all specialties from the database */
+    private static final String READ_ALL_SPECIALTIES = "SELECT specialty FROM specialties";
 
-	@PersistenceContext(name = "PU_DataBank")
-	protected EntityManager em;
+    /** The EntityManager used for database operations */
+    @PersistenceContext(name = "PU_DataBank")
+    protected EntityManager entityManager;
 
-	@Inject
-	protected ExternalContext externalContext;
+    /** The ExternalContext for logging purposes */
+    @Inject
+    protected ExternalContext externalContext;
 
-	private void logMsg(String msg) {
-		((ServletContext) externalContext.getContext()).log(msg);
-	}
+    /**
+     * Logs a message to the servlet context.
+     * 
+     * @param msg the message to log
+     */
+    private void logMsg(String msg) 
+    {
+        ((ServletContext) externalContext.getContext()).log(msg);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<String> readAllSpecialties() {
-		logMsg("reading all specialties");
-		List<String> specialties = new ArrayList<>();
-		try {
-			specialties = (List<String>) em.createNativeQuery(READ_ALL_SPECIALTIES).getResultList();
-		}
-		catch (Exception e) {
-			logMsg("something went wrong:  " + e.getLocalizedMessage());
-		}
-		return specialties;
-	}
-
+    /**
+     * Reads all specialties from the database and returns them as a list of strings.
+     * 
+     * @return a list of specialties as strings, or an empty list if an exception occurs
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<String> readAllSpecialties() 
+    {
+        logMsg("reading all specialties");
+        List<String> specialties = new ArrayList<>();
+        try 
+        {
+            specialties = (List<String>) entityManager.createNativeQuery(READ_ALL_SPECIALTIES).getResultList();
+        }
+        catch (Exception e) 
+        {
+            logMsg("something went wrong: " + e.getLocalizedMessage());
+        }
+        return specialties;
+    }
 }

@@ -160,7 +160,10 @@
 								validatorMessage="#{uiconsts['enter_valid_string']}"
 								value="#{newPhysician.lastName}"
 								a:placeholder="#{uiconsts['columnLabel_LastName']}">
-								<!-- TODO validate using f:validateLength -->
+								<f:validateLength minimum="2" maximum="50" />
+								 <!-- Use a regular expression to allow only alphabets -->
+    							
+							    <f:attribute name="pattern" value="^[a-zA-Z\s]+$" />
 								
 							</h:inputText>
 						</h:panelGroup>
@@ -180,7 +183,7 @@
 								validatorMessage="#{uiconsts['enter_valid_string']}"
 								value="#{newPhysician.firstName}"
 								a:placeholder="#{uiconsts['columnLabel_FirstName']}">
-								<!-- TODO validate using f:validateLength -->
+								<f:validateLength minimum="2" maximum="50" />>
 								
 							</h:inputText>
 						</h:panelGroup>
@@ -194,14 +197,14 @@
 									class="fas fa-phone fa-fw" /></span>
 							</div>
 							<!-- input field for the phone of a new physician attached NewPhysicianView-->
+							<!-- input field for the phone of a new physician -->
 							<h:inputText type="text" id="new_phoneNumber"
-								styleClass="form-control placeholder-darkgray"
-								aria-describedby="phoneNumber-addon"
-								validatorMessage="#{uiconsts['enter_valid_phonenumber']}"
-								value="#{newPhysician.phoneNumber}"
-								a:placeholder="#{uiconsts['example_PhoneNumber']}">
-								<!-- TODO validate using f:validator and using the phone validator class -->
-								
+							    styleClass="form-control placeholder-darkgray"
+							    aria-describedby="phoneNumber-addon"
+							    validatorMessage="#{uiconsts['enter_valid_phonenumber']}"
+							    value="#{newPhysician.phoneNumber}"
+							    a:placeholder="#{uiconsts['example_PhoneNumber']}">
+							    <f:validator validatorId="phoneNumberValidator" />
 							</h:inputText>
 						</h:panelGroup>
 						<!-- display any errors for phone here -->
@@ -220,7 +223,8 @@
 								validatorMessage="#{uiconsts['enter_valid_email']}"
 								value="#{newPhysician.email}"
 								a:placeholder="#{uiconsts['columnLabel_Email']}">
-								<!-- TODO validate using f:validator and using the email validator class -->
+								 <!-- Email validation regex pattern -->
+    							<f:validator validatorId="emailValidator"/>
 								
 							</h:inputText>
 						</h:panelGroup>
@@ -228,7 +232,25 @@
 						<h:message for="new_email" style="color:red" />
 
 						<!-- TODO add a panel for specialty input field -->
-
+						<!-- panel for specialty input -->
+					<h:panelGroup class="input-group">
+					    <!-- separation with specialty icon -->
+					    <div class="input-group-prepend">
+					        <span class="input-group-text" id="specialty-addon"><i class="fas fa-briefcase-medical fa-fw" /></span>
+					    </div>
+					    <!-- input field for the specialty of a new physician attached NewPhysicianView -->
+					    <h:inputText type="text" id="new_specialty"
+					        styleClass="form-control placeholder-darkgray"
+					        aria-describedby="specialty-addon"
+					        validatorMessage="#{uiconsts['enter_valid_string']}"
+					        value="#{newPhysician.specialty}"
+					        a:placeholder="#{uiconsts['columnLabel_Specialty']}">
+					        <!-- Add length validation using f:validateLength -->
+					        <f:validateLength minimum="2" maximum="50" />
+					    </h:inputText>
+					</h:panelGroup>
+			<!-- display any errors for specialty here -->
+			<h:message for="new_specialty" style="color:red" />
 					</h:panelGrid>
 					<!-- submit and cancel buttons for adding new physician -->
 					<h:panelGrid id="actions" columns="2" cellpadding="10">
@@ -253,7 +275,7 @@
 			<!-- form containing all of the table -->
 			<h:form id="physiciansList">
 				<!-- table loaded with list from controller -->
-				<h:dataTable value="#{physicianontroller.physicians}" var="physician"
+				<h:dataTable value="#{physicianController.physicians}" var="physician"
 					styleClass="table table-striped table-bordered table-hover"
 					headerClass="thead-light" captionClass="text-center">
 					<h:column styleClass="width: 5%;">
@@ -273,7 +295,7 @@
 							validatorMessage="#{uiconsts['enter_valid_string']}"
 							value="#{physician.lastName}" rendered="#{physician.editable}">
 							<!-- TODO validate using f:validateLength -->
-							
+							 <f:validateLength minimum="1" maximum="50" />
 						</h:inputText>
 						<br />
 						<!-- if validation fails display text here -->
@@ -291,7 +313,7 @@
 							validatorMessage="#{uiconsts['enter_valid_string']}"
 							value="#{physician.firstName}" rendered="#{physician.editable}">
 							<!-- TODO validate using f:validateLength -->
-							
+							<f:validateLength minimum="1" maximum="50" />
 						</h:inputText>
 						<br />
 						<!-- if validation fails display text here -->
@@ -309,7 +331,7 @@
 							validatorMessage="#{uiconsts['enter_valid_phonenumber']}"
 							value="#{physician.phoneNumber}" rendered="#{physician.editable}">
 							<!-- TODO validate using f:validator and using the phone validator class -->
-							
+							<f:validator validatorId="phoneNumberValidator" />
 						</h:inputText>
 						<br />
 						<!-- if validation fails display text here -->
@@ -327,7 +349,7 @@
 							validatorMessage="#{uiconsts['enter_valid_email']}"
 							value="#{physician.email}" rendered="#{physician.editable}">
 							<!-- TODO validate using f:validator and using the email validator class -->
-							
+							 <f:validator validatorId="emailValidator"/> 
 						</h:inputText>
 						<br />
 						<!-- if validation fails display text here -->
@@ -336,7 +358,23 @@
 					</h:column>
 
 					<!-- TODO add a column for the specialty field -->
-
+					<h:column>
+					    <!-- Column name -->
+					    <f:facet name="header">#{uiconsts['columnLabel_Specialty']}</f:facet>
+					    <!-- cell table content, only visible if the physician is not in an editable state -->
+					    <h:outputText value="#{physician.specialty}" rendered="#{not physician.editable}" />
+					    <!-- input for editing the specialty field, only visible if the physician is in an editable state -->
+					    <h:inputText id="specialty_editable"
+					                 validatorMessage="#{uiconsts['enter_valid_string']}"
+					                 value="#{physician.specialty}" 
+					                 rendered="#{physician.editable}">
+					        <!-- Length validation -->
+					        <f:validateLength minimum="2" maximum="50" />
+					    </h:inputText>
+					    <br />
+					    <!-- display any errors for specialty here -->
+					    <h:message for="specialty_editable" class="validator-message" style="color:red" />
+					</h:column>
 					<!-- Action column -->
 					<h:column>
 						<!-- column name -->
@@ -417,8 +455,8 @@
 						<!-- refresh button -->
 						<h:panelGroup class="refreshFooter">
 							<!-- TODO - fix method call -->
-							<h:commandButton value="#{uiconsts['refreshButtonLabel']}"
-								action="#{physicianController.doSomething()}" />
+							<h:commandButton value="#{uiconsts['refreshButtonLabel']}" action="#{physicianController.loadPhysicians() }" />
+
 						</h:panelGroup>
 					</f:facet>
 				</h:dataTable>

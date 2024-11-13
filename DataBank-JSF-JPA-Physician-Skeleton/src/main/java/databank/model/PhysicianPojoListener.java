@@ -9,23 +9,39 @@ package databank.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+
+
 /**
- * TODO 21 - What annotations should be used on these methods?
- * https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/entity-listeners.html<br>
+ * Entity listener class for PhysicianPojo to set creation and update timestamps.
+ * 
+ * @author Robin Phillis
+ * @version 1.0
+ * @since 11/10/2024
  */
 public class PhysicianPojoListener {
 
-	//TODO 22 - Called before persist to add the dates
-	public void setCreatedOnDate(PhysicianPojo physician) {
-		LocalDateTime now = LocalDateTime.now();
-		physician.setCreated(now);
-		//Might as well call setUpdated as well
-		physician.setUpdated(now);
-	}
+    /**
+     * Called before persisting a PhysicianPojo entity to set the created and updated timestamps.
+     *
+     * @param physician the PhysicianPojo entity being persisted.
+     */
+    @PrePersist
+    public void setCreatedOnDate(PhysicianPojo physician) {
+        LocalDateTime now = LocalDateTime.now();
+        physician.setCreated(now);
+        // Also set the updated date
+        physician.setUpdated(now);
+    }
 
-	//TODO 23 - Called before update to update the date
-	public void setUpdatedDate(PhysicianPojo physician) {
-		physician.setUpdated(LocalDateTime.now());
-	}
-
+    /**
+     * Called before updating a PhysicianPojo entity to set the updated timestamp.
+     *
+     * @param physician the PhysicianPojo entity being updated.
+     */
+    @PreUpdate
+    public void setUpdatedDate(PhysicianPojo physician) {
+        physician.setUpdated(LocalDateTime.now());
+    }
 }

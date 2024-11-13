@@ -24,9 +24,11 @@ public class PhoneValidator implements Validator<String> {
 			.compile("^(\\+\\d( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$");
 
 	@Override
-	public void validate(FacesContext context, UIComponent component, String value) throws ValidatorException {
+	public void validate(FacesContext context, UIComponent component, String value) throws ValidatorException 
+	{
 
-		if (value == null) {
+		if (value == null) 
+		{
 			FacesMessage msg = new FacesMessage("Phone number should not be empty", "Invalid phone number format.");
 			msg.setSeverity(FacesMessage.SEVERITY_ERROR);
 			throw new ValidatorException(msg);
@@ -38,7 +40,24 @@ public class PhoneValidator implements Validator<String> {
 		//Set the severity of your FacesMessage to FacesMessage.SEVERITY_ERROR.
 		//Finally, throw an exception with the FacesMessage in it.
 		//To know what exception should be thrown, look at the signature of this method.
-
+		
+	 
+	    // You can use methods matcher() and matches() from PHONE_PATTERN.
+	    if (!PHONE_PATTERN.matcher(value).matches()) 
+	    {
+	        // If match fails, create a new FacesMessage(String, String) object.
+	        FacesMessage msg = new FacesMessage("Invalid phone number format", "Phone number does not match the required format.");
+	        
+	        // Use proper error messages.
+	        // Set the severity of your FacesMessage to FacesMessage.SEVERITY_ERROR.
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        
+	        // Finally, throw an exception with the FacesMessage in it.
+	        // To know what exception should be thrown, look at the signature of this method.
+	        throw new ValidatorException(msg);
+	    }
 	}
 
 }
+
+

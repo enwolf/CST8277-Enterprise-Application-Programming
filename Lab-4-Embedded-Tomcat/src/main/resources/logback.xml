@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",UTC} %highlight(%-5level) [%-10.10t] %cyan(%logger{36}) - %msg%ex{full}%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Tomcat logging is very very verbose, turn it down to 'just' info -->
+    <logger level="info" additivity="false" name="org.apache.catalina.core">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger level="info" additivity="false" name="org.apache.catalina.startup">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <!-- these Tomcat components need to be even quieter, only log if something is wrong -->
+    <logger level="error" additivity="false" name="org.apache.catalina.util">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger level="error" additivity="false" name="org.apache.catalina.session">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger level="error" additivity="false" name="org.apache.catalina.mapper">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger level="error" additivity="false" name="org.apache.catalina.loader">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger level="error" additivity="false" name="org.apache.catalina.authenticator">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger level="error" additivity="false" name="org.apache.tomcat.util">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- Not just Tomcat that is verbose ... Jersey logging should also be tuned a bit -->
+    <logger level="error" additivity="false" name="org.glassfish.jersey.server.wadl">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- CST 8277 logging -->
+    <logger level="debug" additivity="false" name="com.algonquincollege">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <!-- reset all previous level configurations of all j.u.l. loggers -->
+        <resetJUL>true</resetJUL>
+    </contextListener>
+</configuration>

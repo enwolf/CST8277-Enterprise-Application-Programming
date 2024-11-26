@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @SuppressWarnings("unused")
 
 //TODO - Add annotation so that only non-null fields are in JSON body
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EntityA extends PojoBase implements Serializable {
 	private static final long serialVersionUID = 1L;
 

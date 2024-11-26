@@ -33,6 +33,20 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
      EntityFHasManyToOneBackReference = 'typeF'
 */
 // TODO - Add annotation so that only non-null fields are in JSON body
+
+@JsonTypeInfo(
+	    use = JsonTypeInfo.Id.NAME,
+	    include = JsonTypeInfo.As.PROPERTY,
+	    property = "entity-type")
+	@JsonSubTypes({
+	    @Type(value = EntityA.class, name = "typeA"),
+	    @Type(value = EntityB.class, name = "typeB"),
+	    @Type(value = EntityCHasManyDees.class, name = "typeC"),
+	    @Type(value = EntityDHasManyCees.class, name = "typeD"),
+	    @Type(value = EntityEHasMany.class, name = "typeE"),
+	    @Type(value = EntityFHasManyToOneBackReference.class, name = "typeF")
+	})
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class PojoBase implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -70,6 +84,7 @@ public abstract class PojoBase implements Serializable {
 	}
 
 	// TODO - Add annotation here to change 'foobar' to 'msg' in JSON body
+	@JsonProperty("msg")
 	public String getFoobar() {
 		return foobar;
 	}
